@@ -194,6 +194,33 @@
       
       body { background-size: cover; }
     }
+
+
+
+    .btn-voltar {
+  background-color: #1e90ff; /* azul principal */
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-voltar:hover {
+  background-color: #187bcd; /* azul mais escuro no hover */
+  transform: translateY(-2px); /* efeito de subir */
+}
+
+.btn-voltar:active {
+  background-color: #0f5a9c; /* ainda mais escuro ao clicar */
+  transform: translateY(0);
+}
+
   </style>
 
 
@@ -201,6 +228,9 @@
 
 
 <body>
+
+  <button onclick="window.history.back()">⬅ Voltar</button>
+
   <div class="container">
     
     <div class="logo">
@@ -310,6 +340,7 @@ const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/i
 
 </body>
 </html>
+
 
 
 
