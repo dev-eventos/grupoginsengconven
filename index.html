@@ -3,13 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png" />
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
   <style>
     * { font-family: 'Poppins', sans-serif; }
     body {
@@ -39,102 +34,43 @@
     .btn-google:hover { background-color: #357ae8; }
     .btn-email { background-color: #0C506B; color: white; }
     .btn-email:hover { background-color: #09415a; }
-    @media (min-width: 768px) {
-      .caixa { width: 400px; padding: 30px; }
-      .caixa p { font-size: 18px; }
-    }
   </style>
 </head>
 <body>
 
   <div class="caixa">
     <img src="images/logoazul.png" alt="Logo Convenção" />
-
-    <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
-    <p>Pedimos que responda este formulário até segunda-feira (22/10) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
-
+    <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção!</p>
     <input type="email" id="email" placeholder="Digite seu e-mail" />
-    <button class="btn btn-email" onclick="loginWithEmail()">Entrar com e-mail</button>
-
+    <button class="btn btn-email" onclick="goToNextPage()">Entrar com e-mail</button>
     <p>ou</p>
-
     <button class="btn btn-google" onclick="loginWithGoogle()">Entrar com Google</button>
   </div>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
     const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
     const supabaseKey = "SUA_CHAVE_PUBLICA_DO_SUPABASE_AQUI";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Caminho relativo para index2.html no GitHub Pages
-    const REDIRECT_AFTER_LOGIN = "/convencao/pages/index2.html"; // ajuste conforme sua estrutura no GitHub Pages
+    // Caminho simples para index2.html
+    const REDIRECT = "./index2.html";
 
-    // LOGIN GOOGLE
-    window.loginWithGoogle = async function () {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: REDIRECT_AFTER_LOGIN }
-      });
-      if (error) alert("Erro no login com Google: " + error.message);
-    };
-
-    // LOGIN EMAIL
-    window.loginWithEmail = async function () {
+    function goToNextPage() {
       const email = document.getElementById("email").value.trim();
       if (!email) return alert("Digite seu e-mail!");
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
-      });
-      if (error) alert("Erro ao enviar link: " + error.message);
-      else alert("Link enviado para seu e-mail!");
-    };
 
-    // Pós-login: atualiza tabela de usuários
-    async function handlePostAuth(session) {
-      const email = session?.user?.email;
-      if (!email) { redirectToIndex2(); return; }
-
-      const { data: existing, error: selectError } = await supabase
-        .from('usuarios')
-        .select('used')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (selectError) console.error(selectError);
-
-      if (existing && existing.used) {
-        redirectToIndex2();
-        return;
-      }
-
-      await supabase
-        .from('usuarios')
-        .upsert({
-          email: email,
-          used: true,
-          first_access: new Date().toISOString()
-        }, { onConflict: 'email' });
-
-      redirectToIndex2();
+      // Envia o e-mail para o Supabase (opcional, mas mantém funcionalidade)
+      supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: REDIRECT } })
+        .then(({ error }) => {
+          if (error) alert("Erro ao enviar link: " + error.message);
+          else window.location.href = REDIRECT; // redireciona imediatamente
+        });
     }
 
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') handlePostAuth(session);
-    });
-
-    async function checkSessionOnLoad() {
-      const { data } = await supabase.auth.getSession();
-      const session = data?.session ?? null;
-      if (session) await handlePostAuth(session);
-    }
-
-    checkSessionOnLoad();
-
-    function redirectToIndex2() {
-      window.location.href = REDIRECT_AFTER_LOGIN;
+    function loginWithGoogle() {
+      supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: REDIRECT } })
+        .catch(err => alert("Erro no login com Google: " + err.message));
     }
   </script>
 </body>
