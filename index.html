@@ -69,7 +69,9 @@
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     // CORREÇÃO: Caminho relativo correto para index2.html
-    const REDIRECT_AFTER_LOGIN = "./index2.html";
+    
+// ← Aqui é o lugar para definir a URL de redirecionamento
+const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
 
     // LOGIN GOOGLE
     window.loginWithGoogle = async function () {
@@ -165,6 +167,7 @@
   </script>
 </body>
 </html>
+
 
 
 
