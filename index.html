@@ -45,10 +45,8 @@
 <body>
 
   <div class="caixa">
-    <!-- CORREÇÃO: usar <img> correto -->
-  <img src="images/logoazul.png" alt="Logo Convenção" />
-
-
+    <!-- Logo -->
+    <img src="images/logoazul.png" alt="Logo Convenção" />
 
     <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
     <p>Pedimos que responda este formulário até segunda-feira (22/10) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
@@ -68,10 +66,8 @@
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    // CORREÇÃO: Caminho relativo correto para index2.html
-    
-// ← Aqui é o lugar para definir a URL de redirecionamento
-const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
+    // 🔹 Caminho de redirecionamento correto
+    const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
 
     // LOGIN GOOGLE
     window.loginWithGoogle = async function () {
@@ -99,14 +95,13 @@ const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/i
           options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
         });
         if (error) alert("Erro ao enviar link: " + error.message);
-        else window.location.href = REDIRECT_AFTER_LOGIN; // redireciona imediatamente
+        else window.location.href = REDIRECT_AFTER_LOGIN; 
       } catch (err) {
         console.error("Erro no loginWithEmail:", err);
         alert("Erro ao tentar enviar link para o e-mail.");
       }
     };
 
-    // pós-login: grava / verifica usuário na tabela 'usuarios'
     async function handlePostAuth(session) {
       const email = session?.user?.email;
       if (!email) { redirectToIndex2(); return; }
@@ -144,12 +139,10 @@ const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/i
       }
     }
 
-    // Listener de auth
     supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) handlePostAuth(session);
     });
 
-    // Checa sessão ao carregar a página
     (async function checkSessionOnLoad() {
       try {
         const { data } = await supabaseClient.auth.getSession();
@@ -167,10 +160,3 @@ const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/i
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
