@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Helvetica Neue LT Pro", sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #0C506B;
+      padding: 20px;
+    }
+    .caixa {
+      width: 350px;
+      background-color: #F9F3E4;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .caixa img { max-width: 180px; height: auto; }
+    .caixa p { font-size: 16px; color: #0C506B; line-height: 1.5; }
+    .caixa input { width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
+    .btn { width: 100%; padding: 10px 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; }
+    .btn-google { background-color: #4285F4; color: white; }
+    .btn-google:hover { background-color: #357ae8; }
+    .btn-email { background-color: #0C506B; color: white; }
+    .btn-email:hover { background-color: #09415a; }
+    @media (min-width: 768px) { .caixa { width: 400px; padding: 30px; } .caixa p { font-size: 18px; } }
+  </style>
+</head>
+<body>
+
+  <div class="caixa">
+    <img src="images/logoazul.png" alt="Logo Convenção" />
+    <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
+    <p>Pedimos que responda este formulário até segunda-feira (22/10) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
+
+    <input type="email" id="email" placeholder="Digite seu e-mail" />
+    <button class="btn btn-email" onclick="loginWithEmail()">Entrar com e-mail</button>
+
+    <p>ou</p>
+
+    <button class="btn btn-google" onclick="loginWithGoogle()">Entrar com Google</button>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
+
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+    const REDIRECT_AFTER_LOGIN = window.location.origin + '/index2.html';
+
+    // LOGIN GOOGLE
+    window.loginWithGoogle = async function () {
+      try {
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: REDIRECT_AFTER_LOGIN }
+        });
+        if (error) alert("Erro no login com Google: " + error.message);
+      } catch (err) {
+        console.error("Erro no loginWithGoogle:", err);
+        alert("Erro no login com Google.");
+      }
+    };
+
+    // LOGIN EMAIL (OTP)
+    window.loginWithEmail = async function () {
+      const emailInput = document.getElementById("email");
+      const email = emailInput?.value?.trim();
+      if (!email) return alert("Digite seu e-mail!");
+
+      try {
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email: email,
+          options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
+        });
+        if (error) alert("Erro ao enviar link: " + error.message);
+        else alert("Link enviado para seu e-mail! Confira sua caixa de entrada.");
+      } catch (err) {
+        console.error("Erro no loginWithEmail:", err);
+        alert("Erro ao tentar enviar link para o e-mail.");
+      }
+    };
+
+    // pós-login: grava / verifica usuário na tabela 'usuarios'
+    async function handlePostAuth(session) {
+      const email = session?.user?.email;
+      if (!email) { redirectToIndex2(); return; }
+
+      try {
+        const { data: existing, error: selectError } = await supabaseClient
+          .from('usuarios')
+          .select('used, first_access, email')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (selectError) console.error("Erro ao buscar usuário:", selectError);
+
+        if (existing && existing.used) {
+          alert("Você já confirmou presença anteriormente. Redirecionando...");
+          redirectToIndex2();
+          return;
+        }
+
+        const { error: upsertError } = await supabaseClient
+          .from('usuarios')
+          .upsert({
+            email: email,
+            used: true,
+            first_access: new Date().toISOString()
+          }, { onConflict: 'email' });
+
+        if (upsertError) console.error("Erro ao salvar/atualizar usuário:", upsertError);
+
+        redirectToIndex2();
+
+      } catch (err) {
+        console.error("Erro no fluxo pós-auth:", err);
+        redirectToIndex2();
+      }
+    }
+
+    // Listener de auth
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) handlePostAuth(session);
+    });
+
+    // Checa sessão ao carregar a página
+    (async function checkSessionOnLoad() {
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        const session = data?.session ?? null;
+        if (session) await handlePostAuth(session);
+      } catch (err) {
+        console.error("Erro ao checar sessão:", err);
+      }
+    })();
+
+    function redirectToIndex2() {
+      window.location.href = REDIRECT_AFTER_LOGIN;
+    }
+    window.redirectToIndex2 = redirectToIndex2;
+  </script>
+</body>
+</html>
