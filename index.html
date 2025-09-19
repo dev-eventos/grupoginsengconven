@@ -84,6 +84,18 @@
       }
     };
 
+    const { data, error } = await supabase.auth.signInWithPassword({
+  email: email,
+  password: senha
+});
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+  email: email,
+  password: senha
+});
+
+
+
     // LOGIN EMAIL (OTP)
     window.loginWithEmail = async function () {
       const emailInput = document.getElementById("email");
@@ -102,6 +114,8 @@
         alert("Erro ao tentar enviar link para o e-mail.");
       }
     };
+
+    
 
     async function handlePostAuth(session) {
       const email = session?.user?.email;
@@ -161,6 +175,7 @@
   </script>
 </body>
 </html>
+
 
 
 
