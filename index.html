@@ -10,6 +10,9 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- Importação da biblioteca do Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
   <style>
     * { font-family: 'poppins', sans-serif; }
     body {
@@ -60,128 +63,162 @@
   </div>
 
 <script>
+  // Configuração do Supabase
   const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  
   const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
 
-  document.getElementById("btnEmail").addEventListener("click", loginWithEmail);
-  document.getElementById("btnGoogle").addEventListener("click", loginWithGoogle);
+  // Elementos da página
+  const emailInput = document.getElementById('email');
+  const btnEmail = document.getElementById('btnEmail');
+  const btnGoogle = document.getElementById('btnGoogle');
+  const btnVoltar = document.getElementById('btnVoltar');
 
-  // BOTÃO DE VOLTAR FUNCIONANDO
-  document.getElementById("btnVoltar").addEventListener("click", () => {
+  // Event Listeners
+  btnEmail.addEventListener('click', loginWithEmail);
+  btnGoogle.addEventListener('click', loginWithGoogle);
+  btnVoltar.addEventListener('click', () => {
     sessionStorage.setItem("voltar", "true");
     window.history.back();
   });
 
-  function loginWithEmail() {
-    const email = prompt("Digite seu email"); // Exemplo simples
-    console.log("Login com email:", email);
+  // Função de login com email
+  async function loginWithEmail() {
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+      alert('Por favor, digite seu e-mail');
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: REDIRECT_AFTER_LOGIN
+        }
+      });
+
+      if (error) {
+        alert('Erro ao enviar link de autenticação: ' + error.message);
+        return;
+      }
+
+      alert('Link de autenticação enviado para seu e-mail! Verifique sua caixa de entrada.');
+    } catch (error) {
+      console.error('Erro no login com email:', error);
+      alert('Erro inesperado ao tentar fazer login');
+    }
   }
 
-  function loginWithGoogle() {
-    console.log("Login com Google");
+  // Função de login com Google
+  async function loginWithGoogle() {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: REDIRECT_AFTER_LOGIN
+        }
+      });
 
-    window.loginWithGoogle = async function () {
-      try {
-        const { error } = await supabaseClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: REDIRECT_AFTER_LOGIN }
-        });
-        if (error) alert("Erro no login com Google: " + error.message);
-      } catch (err) {
-        console.error("Erro no loginWithGoogle:", err);
-        alert("Erro no login com Google.");
+      if (error) {
+        alert('Erro ao autenticar com Google: ' + error.message);
       }
-    };
-
-    async function checarSessao() {
-      const { data, error } = await supabaseClient.auth.getSession();
-      console.log(data, error);
+    } catch (error) {
+      console.error('Erro no login com Google:', error);
+      alert('Erro inesperado ao tentar fazer login com Google');
     }
-    checarSessao();
+  }
 
-    window.loginWithEmail = async function () {
-      const emailInput = document.getElementById("email");
-      const email = emailInput?.value?.trim();
-      if (!email) return alert("Digite seu e-mail!");
+  // Verificar se já existe uma sessão ativa
+  async function checkSession() {
+    try {
+      if (sessionStorage.getItem("voltar") === "true") {
+        sessionStorage.removeItem("voltar");
+        return;
+      }
+      
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Erro ao verificar sessão:', error);
+        return;
+      }
+      
+      if (data.session) {
+        // Usuário já está autenticado, redirecionar
+        window.location.href = REDIRECT_AFTER_LOGIN;
+      }
+    } catch (error) {
+      console.error('Erro ao verificar sessão:', error);
+    }
+  }
 
-      try {
-        const { error } = await supabaseClient.auth.signInWithOtp({
+  // Verificar sessão ao carregar a página
+  checkSession();
+
+  // Ouvir mudanças no estado de autenticação
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      // Usuário autenticado com sucesso
+      handlePostAuth(session);
+    }
+  });
+
+  // Função para lidar com pós-autenticação
+  async function handlePostAuth(session) {
+    const email = session.user.email;
+    
+    if (!email) {
+      redirectToIndex2();
+      return;
+    }
+
+    try {
+      // Verificar se o usuário já existe
+      const { data: existing, error: selectError } = await supabase
+        .from('usuarios')
+        .select('used, first_access, email')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (selectError) {
+        console.error("Erro ao buscar usuário:", selectError);
+      }
+
+      if (existing && existing.used) {
+        alert("Você já confirmou presença anteriormente. Redirecionando...");
+        redirectToIndex2();
+        return;
+      }
+
+      // Salvar/atualizar usuário no Supabase
+      const { error: upsertError } = await supabase
+        .from('usuarios')
+        .upsert({
           email: email,
-          options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
-        });
-        if (error) alert("Erro ao enviar link: " + error.message);
-        else window.location.href = REDIRECT_AFTER_LOGIN;
-      } catch (err) {
-        console.error("Erro no loginWithEmail:", err);
-        alert("Erro ao tentar enviar link para o e-mail.");
+          used: true,
+          first_access: new Date().toISOString()
+        }, { onConflict: 'email' });
+
+      if (upsertError) {
+        console.error("Erro ao salvar/atualizar usuário:", upsertError);
       }
-    };
 
-    async function handlePostAuth(session) {
-      const email = session?.user?.email;
-      if (!email) { redirectToIndex2(); return; }
+      redirectToIndex2();
 
-      try {
-        const { data: existing, error: selectError } = await supabaseClient
-          .from('usuarios')
-          .select('used, first_access, email')
-          .eq('email', email)
-          .maybeSingle();
-
-        if (selectError) console.error("Erro ao buscar usuário:", selectError);
-
-        if (existing && existing.used) {
-          alert("Você já confirmou presença anteriormente. Redirecionando...");
-          redirectToIndex2();
-          return;
-        }
-
-        const { error: upsertError } = await supabaseClient
-          .from('usuarios')
-          .upsert({
-            email: email,
-            used: true,
-            first_access: new Date().toISOString()
-          }, { onConflict: 'email' });
-
-        if (upsertError) console.error("Erro ao salvar/atualizar usuário:", upsertError);
-
-        redirectToIndex2();
-
-      } catch (err) {
-        console.error("Erro no fluxo pós-auth:", err);
-        redirectToIndex2();
-      }
+    } catch (err) {
+      console.error("Erro no fluxo pós-auth:", err);
+      redirectToIndex2();
     }
+  }
 
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) handlePostAuth(session);
-    });
-
-    (async function checkSessionOnLoad() {
-      try {
-        if (sessionStorage.getItem("voltar") === "true") {
-          sessionStorage.removeItem("voltar");
-          return;
-        }
-        const { data } = await supabaseClient.auth.getSession();
-        const session = data?.session ?? null;
-        if (session) await handlePostAuth(session);
-      } catch (err) {
-        console.error("Erro ao checar sessão:", err);
-      }
-    })();
-
-    function redirectToIndex2() {
-      window.location.href = REDIRECT_AFTER_LOGIN;
-    }
-    window.redirectToIndex2 = redirectToIndex2;
+  function redirectToIndex2() {
+    window.location.href = REDIRECT_AFTER_LOGIN;
   }
 </script>
 
 </body>
 </html>
-
