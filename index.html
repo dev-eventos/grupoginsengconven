@@ -158,7 +158,7 @@ checarSessao();
       if (event === 'SIGNED_IN' && session) handlePostAuth(session);
     });
 
-    (async function checkSessionOnLoad() {
+    async function checkSessionOnLoad() {
       try {
         const { data } = await supabaseClient.auth.getSession();
         const session = data?.session ?? null;
@@ -171,7 +171,7 @@ checarSessao();
     function redirectToIndex2() {
       window.location.href = REDIRECT_AFTER_LOGIN;
     }
-    window.redirectToIndex2 = redirectToIndex2;
+    window.redirectToIndex2 = redirectToIndex2;}
 </script>
 
 
@@ -181,6 +181,7 @@ checarSessao();
 
 </body>
 </html>
+
 
 
 
