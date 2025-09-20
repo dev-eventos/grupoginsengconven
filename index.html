@@ -10,8 +10,6 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
- 
-
   <style>
     * { font-family: 'poppins', sans-serif; }
     body {
@@ -56,175 +54,140 @@
     <input type="email" id="email" placeholder="Digite seu e-mail" />
     <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
     <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
-    
-  
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-  <!-- Importação da biblioteca do Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-<script>
-  // Configuração do Supabase
-  const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const REDIRECT_AFTER_LOGIN = "https://grupoginseng.github.io/grupoginsengconven/index2.html";
 
-  
-  const REDIRECT_AFTER_LOGIN = "https://grupoginseng.github.io/grupoginsengconven/index2.html";
+    const emailInput = document.getElementById('email');
+    const btnEmail = document.getElementById('btnEmail');
+    const btnGoogle = document.getElementById('btnGoogle');
 
-  // Elementos da página
-  const emailInput = document.getElementById('email');
-  const btnEmail = document.getElementById('btnEmail');
-  const btnGoogle = document.getElementById('btnGoogle');
-  
+    btnEmail.addEventListener('click', loginWithEmail);
+    btnGoogle.addEventListener('click', loginWithGoogle);
 
-  // Event Listeners
-  btnEmail.addEventListener('click', loginWithEmail);
-  btnGoogle.addEventListener('click', loginWithGoogle);
-  
-  // Função de login com email
-  async function loginWithEmail() {
-    const email = emailInput.value.trim();
-    
-    if (!email) {
-      alert('Por favor, digite seu e-mail');
-      return;
-    }
+    async function loginWithEmail() {
+      const email = emailInput.value.trim();
 
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          emailRedirectTo: REDIRECT_AFTER_LOGIN
-        }
-      });
-
-      if (error) {
-        alert('Erro ao enviar link de autenticação: ' + error.message);
+      if (!email) {
+        alert('Por favor, digite seu e-mail');
         return;
       }
 
-      alert('Link de autenticação enviado para seu e-mail! Verifique sua caixa de entrada.');
-    } catch (error) {
-      console.error('Erro no login com email:', error);
-      alert('Erro inesperado ao tentar fazer login');
-    }
-  }
+      try {
+        // Salvar/atualizar usuário no Supabase
+        const { error: upsertError } = await supabase
+          .from('usuarios')
+          .upsert({
+            email: email,
+            used: false,
+            first_access: new Date().toISOString()
+          }, { onConflict: 'email' });
 
-  // Função de login com Google
-  async function loginWithGoogle() {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: REDIRECT_AFTER_LOGIN
+        if (upsertError) {
+          console.error("Erro ao salvar usuário:", upsertError);
+          alert("Erro ao salvar usuário");
+          return;
         }
-      });
 
-      if (error) {
-        alert('Erro ao autenticar com Google: ' + error.message);
+        // Salvar no sessionStorage para lembrar o login
+        sessionStorage.setItem('user_email', email);
+
+        // Enviar link de autenticação por e-mail (opcional, pode remover se não quiser)
+        const { error } = await supabase.auth.signInWithOtp({
+          email: email,
+          options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
+        });
+
+        if (error) console.warn("Erro ao enviar link de autenticação:", error.message);
+
+        // Redirecionar imediatamente para o formulário
+        window.location.href = REDIRECT_AFTER_LOGIN;
+
+      } catch (error) {
+        console.error('Erro no login com email:', error);
+        alert('Erro inesperado ao tentar fazer login');
       }
-    } catch (error) {
-      console.error('Erro no login com Google:', error);
-      alert('Erro inesperado ao tentar fazer login com Google');
     }
-  }
 
-  // Verificar se já existe uma sessão ativa
-  async function checkSession() {
-    try {
-      if (sessionStorage.getItem("voltar") === "true") {
-        sessionStorage.removeItem("voltar");
-        return;
+    async function loginWithGoogle() {
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: REDIRECT_AFTER_LOGIN }
+        });
+
+        if (error) alert('Erro ao autenticar com Google: ' + error.message);
+      } catch (error) {
+        console.error('Erro no login com Google:', error);
+        alert('Erro inesperado ao tentar fazer login com Google');
       }
-      
-      const { data, error } = await supabase.auth.getSession();
-      
-      if (error) {
+    }
+
+    async function checkSession() {
+      try {
+        if (sessionStorage.getItem("voltar") === "true") {
+          sessionStorage.removeItem("voltar");
+          return;
+        }
+
+        const { data, error } = await supabase.auth.getSession();
+        if (error) console.error('Erro ao verificar sessão:', error);
+
+        if (data.session) window.location.href = REDIRECT_AFTER_LOGIN;
+      } catch (error) {
         console.error('Erro ao verificar sessão:', error);
-        return;
       }
-      
-      if (data.session) {
-        // Usuário já está autenticado, redirecionar
+    }
+
+    checkSession();
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) handlePostAuth(session);
+    });
+
+    async function handlePostAuth(session) {
+      const email = session.user.email;
+      if (!email) { window.location.href = REDIRECT_AFTER_LOGIN; return; }
+
+      try {
+        const { data: existing, error: selectError } = await supabase
+          .from('usuarios')
+          .select('used, first_access, email')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (selectError) console.error("Erro ao buscar usuário:", selectError);
+
+        if (existing && existing.used) {
+          alert("Você já confirmou presença anteriormente. Redirecionando...");
+          window.location.href = REDIRECT_AFTER_LOGIN;
+          return;
+        }
+
+        const { error: upsertError } = await supabase
+          .from('usuarios')
+          .upsert({
+            email: email,
+            used: true,
+            first_access: existing ? existing.first_access : new Date().toISOString()
+          }, { onConflict: 'email' });
+
+        if (upsertError) console.error("Erro ao salvar/atualizar usuário:", upsertError);
+
+        window.location.href = REDIRECT_AFTER_LOGIN;
+
+      } catch (err) {
+        console.error("Erro no fluxo pós-auth:", err);
         window.location.href = REDIRECT_AFTER_LOGIN;
       }
-    } catch (error) {
-      console.error('Erro ao verificar sessão:', error);
     }
-  }
-
-  // Verificar sessão ao carregar a página
-  checkSession();
-
-  // Ouvir mudanças no estado de autenticação
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session) {
-      // Usuário autenticado com sucesso
-      handlePostAuth(session);
-    }
-  });
-
-  // Função para lidar com pós-autenticação
-  async function handlePostAuth(session) {
-    const email = session.user.email;
-    
-    if (!email) {
-      redirectToIndex2();
-      return;
-    }
-
-    try {
-      // Verificar se o usuário já existe
-      const { data: existing, error: selectError } = await supabase
-        .from('usuarios')
-        .select('used, first_access, email')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (selectError) {
-        console.error("Erro ao buscar usuário:", selectError);
-      }
-
-      if (existing && existing.used) {
-        alert("Você já confirmou presença anteriormente. Redirecionando...");
-        redirectToIndex2();
-        return;
-      }
-
-      // Salvar/atualizar usuário no Supabase
-      const { error: upsertError } = await supabase
-        .from('usuarios')
-        .upsert({
-          email: email,
-          used: true,
-          first_access: new Date().toISOString()
-        }, { onConflict: 'email' });
-
-      if (upsertError) {
-        console.error("Erro ao salvar/atualizar usuário:", upsertError);
-      }
-
-      redirectToIndex2();
-
-    } catch (err) {
-      console.error("Erro no fluxo pós-auth:", err);
-      redirectToIndex2();
-    }
-  }
-
-  function redirectToIndex2() {
-    window.location.href = REDIRECT_AFTER_LOGIN;
-  }
-</script>
-
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
