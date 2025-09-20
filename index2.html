@@ -1,16 +1,12 @@
 <!DOCTYPE html> 
 <html lang="pt-BR"> 
 <head> 
-  <meta charset="UTF-8"> 
-   <!-- Favicon -->
+  <meta charset="UTF-8" /> 
+  <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="64x64" href="https://grupoginseng.github.io/grupoginsengconven/favicon.png" alt="favicon" />
   <style> 
     /* Reset básico */ 
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    } 
+    * { margin: 0; padding: 0; box-sizing: border-box; } 
     body { 
       min-height: 100vh; 
       display: flex; 
@@ -32,7 +28,6 @@
       align-items: center; 
     } 
     .logo img { 
-      /*imagem logo*/ 
       width: 100%; 
       max-width: 270px; 
       height: auto; 
@@ -40,7 +35,6 @@
       margin-bottom: 40px; 
     } 
     form { 
-      /*formulario*/ 
       width: 100%; 
       display: flex; 
       flex-direction: column; 
@@ -149,7 +143,7 @@
     <div class="logo"> 
       <img src="https://grupoginseng.github.io/grupoginsengconven/convencao.png" alt="Logo Convenção"> 
     </div> 
-    <form> 
+    <form id="formConvencao"> 
       <div> 
         <label>Você confirma sua presença na Convenção?</label> 
         <div class="opcao"> 
@@ -190,7 +184,7 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";  
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
-    const form = document.querySelector("form"); 
+    const form = document.getElementById("formConvencao"); 
     form.addEventListener("submit", async (e) => { 
       e.preventDefault(); 
 
@@ -199,27 +193,35 @@
       const estado = [...form.querySelectorAll('input[name="regiao"]:checked')] 
         .map(el => el.value).join(", "); 
       const nome = form.nome.value; 
+      const cracha = form.cracha.value;
       const restricao = form.restricao.value; 
       const loja_vd = form.loja.value ? parseInt(form.loja.value) : null; 
 
-      const { data, error } = await supabase 
-        .from("convencao") 
-        .insert([{ presenca, estado, nome, restricao, loja_vd }]); 
+      try {
+        const { data, error } = await supabase 
+          .from("convencao") 
+          .insert([{ presenca, estado, nome, cracha, restricao, loja_vd }]); 
 
-      if (error) { 
-        console.error("Erro ao enviar:", error); 
-        alert("❌ Erro ao enviar, tente novamente!"); 
-      } else { 
-        alert("✅ Resposta registrada com sucesso!"); 
-        form.reset(); 
-        window.location.href = "https://grupoginseng.github.io/grupoginsengconven/index3.html"; 
-      } 
+        if (error) { 
+          console.error("Erro ao enviar:", error); 
+          alert("❌ Erro ao enviar, tente novamente!"); 
+        } else { 
+          alert("✅ Resposta registrada com sucesso!"); 
+          form.reset(); 
+          // Redirecionamento garantido
+          window.location.assign("https://grupoginseng.github.io/grupoginsengconven/index3.html"); 
+        }
+      } catch(err) {
+        console.error("Erro inesperado:", err);
+        alert("❌ Erro inesperado ao enviar!");
+      }
     }); 
 
-    // Botão Voltar que realmente fica no index.html
     document.getElementById("btnVoltar").addEventListener("click", () => {
-      window.location.replace("https://grupoginseng.github.io/grupoginsengconven/index.html");
+      window.location.assign("https://grupoginseng.github.io/grupoginsengconven/index.html");
     });
   </script> 
 </body> 
 </html>
+
+
