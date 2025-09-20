@@ -94,14 +94,6 @@
   password: senha
 });
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-  email: email,
-  password: senha
-});
-
-
-  }
-
       // LOGIN EMAIL (OTP)
     window.loginWithEmail = async function () {
       const emailInput = document.getElementById("email");
@@ -187,6 +179,7 @@
 
 </body>
 </html>
+
 
 
 
