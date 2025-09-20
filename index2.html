@@ -56,8 +56,8 @@
       display: flex; 
       flex-direction: column; 
       color: #F9F3E4; 
-      gap: 8px; /* distância entre cada checkbox */ 
-      margin-top: 10px; /* aumenta espaço entre o label e os checkboxes */ 
+      gap: 8px; 
+      margin-top: 10px; 
     } 
     .opcao label { 
       display: flex; 
@@ -66,39 +66,30 @@
       font-size: 17px; 
       font-weight: normal; 
     } 
-    /* --- CORREÇÃO FINAL: MARCADOR INTERNO (BOLINHA) --- */ 
     .opcao input[type="radio"], .opcao input[type="checkbox"] { 
-      /* 1. Esconde o botão padrão */ 
       -webkit-appearance: none; 
       appearance: none; 
       margin: 0; 
-      /* 2. Estiliza a caixa externa */ 
       width: 28px; 
       height: 28px; 
       border-radius: 8px; 
       cursor: pointer; 
       background-color: #e2e2e2; 
-      /* 3. Prepara o container para centralizar o marcador */ 
       display: grid; 
       place-content: center; 
     } 
-    /* 4. Cria a "bolinha" interna */ 
     .opcao input[type="radio"]::before, .opcao input[type="checkbox"]::before { 
       content: ""; 
-      width: 16px; /* Tamanho da bolinha */ 
+      width: 16px; 
       height: 16px; 
-      border-radius: 50%; /* Deixa o marcador perfeitamente redondo */ 
-      /* 5. Esconde a bolinha por padrão */ 
+      border-radius: 50%; 
       transform: scale(0); 
       transition: 120ms transform ease-in-out; 
-      /* 6. Define a cor da bolinha */ 
       background-color: #0C506B; 
     } 
-    /* 7. Mostra a bolinha quando a opção for selecionada */ 
     .opcao input[type="radio"]:checked::before, .opcao input[type="checkbox"]:checked::before { 
-      transform: scale(1); /* Anima a bolinha para o tamanho normal */ 
+      transform: scale(1); 
     } 
-    /* --- FIM DA CORREÇÃO --- */ 
     input[type="text"], textarea { 
       width: 100%; 
       padding: 14px; 
@@ -111,15 +102,13 @@
       min-height: 80px; 
       resize: vertical; 
     } 
-    /* Adicionado input[type="number"] aqui também */ 
     input[type="text"], input[type="number"], textarea, button { 
       padding: 14px; 
       font-size: 18px; 
       margin-bottom: 8px; 
-      border-radius: 8px; /* Cantos bem arredondados, como na imagem */ 
+      border-radius: 8px; 
     } 
     button { 
-      /*botão de enviar*/ 
       padding: 14px; 
       font-size: 18px; 
       font-weight: bold; 
@@ -134,7 +123,6 @@
     button:hover { 
       background: #fff; 
     } 
-    /* Ajustes para Desktop */ 
     @media (min-width: 768px) { 
       .container { 
         max-width: 600px; 
@@ -146,10 +134,9 @@
       form > div > label { 
         text-align: center; 
       } 
-      /* --- CORREÇÃO NA VERSÃO DESKTOP --- */ 
       input[type="text"], textarea, button { 
-        padding: 12px; /* Diminuído de 16px para 12px */ 
-        font-size: 18px; /* Diminuído de 20px para 18px */ 
+        padding: 12px; 
+        font-size: 18px; 
       } 
       body { 
         background-size: cover; 
@@ -194,21 +181,19 @@
         <input type="number" id="loja" name="loja" inputmode="numeric" pattern="[0-9]*" > 
       </div> 
       <button type="submit">Enviar</button> 
+      <button type="button" id="btnVoltar">Voltar</button> 
     </form> 
   </div> 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script> 
   <script> 
-    // 1. Inicializa o Supabase 
-    const SUPABASE_URL = "https://utqgfvskdomojiocijeg.supabase.co"; // coloque sua URL 
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w"; // coloque sua chave anon 
+    const SUPABASE_URL = "https://utqgfvskdomojiocijeg.supabase.co";  
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";  
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
-    // 2. Captura o formulário 
     const form = document.querySelector("form"); 
     form.addEventListener("submit", async (e) => { 
       e.preventDefault(); 
 
-      // 3. Pega os valores do formulário 
       const presenca = [...form.querySelectorAll('input[name="presenca"]:checked')] 
         .map(el => el.value).join(", "); 
       const estado = [...form.querySelectorAll('input[name="regiao"]:checked')] 
@@ -217,9 +202,8 @@
       const restricao = form.restricao.value; 
       const loja_vd = form.loja.value ? parseInt(form.loja.value) : null; 
 
-      // 4. Envia para Supabase 
       const { data, error } = await supabase 
-        .from("convencao") // tabela no Supabase 
+        .from("convencao") 
         .insert([{ presenca, estado, nome, restricao, loja_vd }]); 
 
       if (error) { 
@@ -228,16 +212,14 @@
       } else { 
         alert("✅ Resposta registrada com sucesso!"); 
         form.reset(); 
-        
-        window.location.href = "https://grupoginseng.github.io/grupoginsengconven/index3.html";
-
+        window.location.href = "https://grupoginseng.github.io/grupoginsengconven/index3.html"; 
       } 
     }); 
-  </script> 
+
+    // Botão Voltar que realmente fica no index.html
+    document.getElementById("btnVoltar").addEventListener("click", () => {
+      window.location.replace("https://grupoginseng.github.io/grupoginsengconven/index.html");
+    });
   </script> 
 </body> 
 </html>
-
-
-
-
