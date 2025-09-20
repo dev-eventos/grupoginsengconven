@@ -324,12 +324,13 @@ const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/i
       .insert([{ presenca, estado, restricao, nome, loja }]);
 
     if (error) {
-      console.error("Erro ao enviar:", error);
-      alert("❌ Erro ao enviar, tente novamente!");
-    } else {
-      alert("✅ Resposta registrada com sucesso!");
-      form.reset();
-    }
+  console.error("Erro ao enviar:", error);
+  alert("❌ Erro ao enviar, tente novamente!");
+} else {
+  // Redireciona para a página de agradecimento
+  window.location.href = "index3.html";
+}
+
   });
 </script>
 
@@ -340,6 +341,7 @@ const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/i
 
 </body>
 </html>
+
 
 
 
