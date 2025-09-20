@@ -54,48 +54,36 @@
     <input type="email" id="email" placeholder="Digite seu e-mail" />
     <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
     <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
+    
+    <!-- BOTÃO DE VOLTAR -->
+    <button id="btnVoltar" class="btn btn-email" style="margin-top:10px;">Voltar</button>
   </div>
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+<script>
+  const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
+  const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
 
-    // Funções globais
-    async function loginWithEmail() {
-      const emailInput = document.getElementById("email");
-      const email = emailInput?.value?.trim();
-      if (!email) return alert("Digite seu e-mail!");
+  document.getElementById("btnEmail").addEventListener("click", loginWithEmail);
+  document.getElementById("btnGoogle").addEventListener("click", loginWithGoogle);
 
-      try {
-        // Envia link de login
-        const { error: otpError } = await supabaseClient.auth.signInWithOtp({
-          email: email,
-          options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
-        });
-        if (otpError) {
-          alert("Erro ao enviar link: " + otpError.message);
-          return;
-        }
+  // BOTÃO DE VOLTAR FUNCIONANDO
+  document.getElementById("btnVoltar").addEventListener("click", () => {
+    sessionStorage.setItem("voltar", "true");
+    window.history.back();
+  });
 
-        // Salva no Supabase imediatamente
-        const { error: upsertError } = await supabaseClient
-          .from('usuarios')
-          .upsert({ email: email, used: true, first_access: new Date().toISOString() }, { onConflict: 'email' });
+  function loginWithEmail() {
+    const email = prompt("Digite seu email"); // Exemplo simples
+    console.log("Login com email:", email);
+  }
 
-        if (upsertError) console.error("Erro ao salvar usuário:", upsertError);
+  function loginWithGoogle() {
+    console.log("Login com Google");
 
-        alert("Link enviado para o e-mail! Verifique sua caixa de entrada.");
-      } catch (err) {
-        console.error("Erro no loginWithEmail:", err);
-        alert("Erro ao tentar enviar link para o e-mail.");
-      }
-    }
-
-    async function loginWithGoogle() {
+    window.loginWithGoogle = async function () {
       try {
         const { error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
@@ -106,7 +94,31 @@
         console.error("Erro no loginWithGoogle:", err);
         alert("Erro no login com Google.");
       }
+    };
+
+    async function checarSessao() {
+      const { data, error } = await supabaseClient.auth.getSession();
+      console.log(data, error);
     }
+    checarSessao();
+
+    window.loginWithEmail = async function () {
+      const emailInput = document.getElementById("email");
+      const email = emailInput?.value?.trim();
+      if (!email) return alert("Digite seu e-mail!");
+
+      try {
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email: email,
+          options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
+        });
+        if (error) alert("Erro ao enviar link: " + error.message);
+        else window.location.href = REDIRECT_AFTER_LOGIN;
+      } catch (err) {
+        console.error("Erro no loginWithEmail:", err);
+        alert("Erro ao tentar enviar link para o e-mail.");
+      }
+    };
 
     async function handlePostAuth(session) {
       const email = session?.user?.email;
@@ -129,7 +141,11 @@
 
         const { error: upsertError } = await supabaseClient
           .from('usuarios')
-          .upsert({ email: email, used: true, first_access: new Date().toISOString() }, { onConflict: 'email' });
+          .upsert({
+            email: email,
+            used: true,
+            first_access: new Date().toISOString()
+          }, { onConflict: 'email' });
 
         if (upsertError) console.error("Erro ao salvar/atualizar usuário:", upsertError);
 
@@ -141,21 +157,16 @@
       }
     }
 
-    function redirectToIndex2() {
-      window.location.href = REDIRECT_AFTER_LOGIN;
-    }
-
-    window.redirectToIndex2 = redirectToIndex2;
-
-    document.getElementById("btnEmail").addEventListener("click", loginWithEmail);
-    document.getElementById("btnGoogle").addEventListener("click", loginWithGoogle);
-
     supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) handlePostAuth(session);
     });
 
     (async function checkSessionOnLoad() {
       try {
+        if (sessionStorage.getItem("voltar") === "true") {
+          sessionStorage.removeItem("voltar");
+          return;
+        }
         const { data } = await supabaseClient.auth.getSession();
         const session = data?.session ?? null;
         if (session) await handlePostAuth(session);
@@ -163,6 +174,14 @@
         console.error("Erro ao checar sessão:", err);
       }
     })();
-  </script>
+
+    function redirectToIndex2() {
+      window.location.href = REDIRECT_AFTER_LOGIN;
+    }
+    window.redirectToIndex2 = redirectToIndex2;
+  }
+</script>
+
 </body>
 </html>
+
