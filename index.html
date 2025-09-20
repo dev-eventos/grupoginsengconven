@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="64x64" href=="https://dev-eventos.github.io/grupoginsengconven/favicon.png" alt="favicon" />
+  <link rel="icon" type="image/png" sizes="64x64" href="https://dev-eventos.github.io/grupoginsengconven/favicon.png" alt="favicon" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -59,7 +59,8 @@
 <script>
   const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
-  const supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
 
      // 🔹 Caminho de redirecionamento correto
     const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
@@ -180,6 +181,7 @@ checarSessao();
 
 </body>
 </html>
+
 
 
 
