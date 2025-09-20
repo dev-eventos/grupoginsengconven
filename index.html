@@ -52,6 +52,7 @@
     <p>Pedimos que responda este formulário até segunda-feira (22/10) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
 
     <input type="email" id="email" placeholder="Digite seu e-mail" />
+    <input type="password" id="senha" placeholder="Digite sua senha" />
     <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
     <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
   </div>
@@ -74,9 +75,10 @@
 
     async function loginWithEmail() {
       const email = emailInput.value.trim();
+      const senha = document.getElementById('senha').value.trim();
 
-      if (!email) {
-        alert('Por favor, digite seu e-mail');
+      if (!email || !senha) {
+        alert('Por favor, digite seu e-mail e senha');
         return;
       }
 
@@ -86,6 +88,7 @@
           .from('usuarios')
           .upsert({
             email: email,
+            senha: senha,
             used: false,
             first_access: new Date().toISOString()
           }, { onConflict: 'email' });
