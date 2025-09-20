@@ -1,188 +1,235 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="wid href="https://dev-eventos.github.io/grupoginsengconven/favicon.png"> 
+  <style> 
+    /* Reset básico */ 
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    } 
+    body { 
+      min-height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: flex-start; 
+      padding: 52px; 
+      background-color: #0C506B; 
+      background-image: url('images/fundo.png'); 
+      background-repeat: no-repeat; 
+      background-position: center top; 
+      background-size: contain; 
+      font-family: "Helvetica Neue LT Pro", sans-serif; 
+    } 
+    .container { 
+      width: 100%; 
+      max-width: 393px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+    } 
+    .logo img { 
+      /*imagem logo*/ 
+      width: 100%; 
+      max-width: 270px; 
+      height: auto; 
+      margin-top: 40px; 
+      margin-bottom: 40px; 
+    } 
+    form { 
+      /*formulario*/ 
+      width: 100%; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 25px; 
+      font-size: 18px; 
+    } 
+    label { 
+      margin-bottom: 8px; 
+      font-weight: bold; 
+      color: #fff; 
+    } 
+    .opcao { 
+      display: flex; 
+      flex-direction: column; 
+      color: #F9F3E4; 
+      gap: 8px; /* distância entre cada checkbox */ 
+      margin-top: 10px; /* aumenta espaço entre o label e os checkboxes */ 
+    } 
+    .opcao label { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      font-size: 17px; 
+      font-weight: normal; 
+    } 
+    /* --- CORREÇÃO FINAL: MARCADOR INTERNO (BOLINHA) --- */ 
+    .opcao input[type="radio"], .opcao input[type="checkbox"] { 
+      /* 1. Esconde o botão padrão */ 
+      -webkit-appearance: none; 
+      appearance: none; 
+      margin: 0; 
+      /* 2. Estiliza a caixa externa */ 
+      width: 28px; 
+      height: 28px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      background-color: #e2e2e2; 
+      /* 3. Prepara o container para centralizar o marcador */ 
+      display: grid; 
+      place-content: center; 
+    } 
+    /* 4. Cria a "bolinha" interna */ 
+    .opcao input[type="radio"]::before, .opcao input[type="checkbox"]::before { 
+      content: ""; 
+      width: 16px; /* Tamanho da bolinha */ 
+      height: 16px; 
+      border-radius: 50%; /* Deixa o marcador perfeitamente redondo */ 
+      /* 5. Esconde a bolinha por padrão */ 
+      transform: scale(0); 
+      transition: 120ms transform ease-in-out; 
+      /* 6. Define a cor da bolinha */ 
+      background-color: #0C506B; 
+    } 
+    /* 7. Mostra a bolinha quando a opção for selecionada */ 
+    .opcao input[type="radio"]:checked::before, .opcao input[type="checkbox"]:checked::before { 
+      transform: scale(1); /* Anima a bolinha para o tamanho normal */ 
+    } 
+    /* --- FIM DA CORREÇÃO --- */ 
+    input[type="text"], textarea { 
+      width: 100%; 
+      padding: 14px; 
+      font-size: 18px; 
+      border-radius: 8px; 
+      border: none; 
+      outline: none; 
+    } 
+    textarea { 
+      min-height: 80px; 
+      resize: vertical; 
+    } 
+    /* Adicionado input[type="number"] aqui também */ 
+    input[type="text"], input[type="number"], textarea, button { 
+      padding: 14px; 
+      font-size: 18px; 
+      margin-bottom: 8px; 
+      border-radius: 8px; /* Cantos bem arredondados, como na imagem */ 
+    } 
+    button { 
+      /*botão de enviar*/ 
+      padding: 14px; 
+      font-size: 18px; 
+      font-weight: bold; 
+      color: #0C506B; 
+      background: #F9F3E4; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: background 0.3s; 
+      margin-top: 10px; 
+    } 
+    button:hover { 
+      background: #fff; 
+    } 
+    /* Ajustes para Desktop */ 
+    @media (min-width: 768px) { 
+      .container { 
+        max-width: 600px; 
+        padding: 20px; 
+      } 
+      form { 
+        font-size: 20px; 
+      } 
+      form > div > label { 
+        text-align: center; 
+      } 
+      /* --- CORREÇÃO NA VERSÃO DESKTOP --- */ 
+      input[type="text"], textarea, button { 
+        padding: 12px; /* Diminuído de 16px para 12px */ 
+        font-size: 18px; /* Diminuído de 20px para 18px */ 
+      } 
+      body { 
+        background-size: cover; 
+      } 
+    } 
+  </style> 
+</head> 
+<body> 
+  <div class="container"> 
+    <div class="logo"> 
+      <img src="https://dev-eventos.github.io/grupoginsengconven/logoazul.png" alt="Logo"> 
+    </div> 
+    <form> 
+      <div> 
+        <label>Você confirma sua presença na Convenção?</label> 
+        <div class="opcao"> 
+          <label><input type="radio" name="presenca" value="sim"> Sim</label> 
+          <label><input type="radio" name="presenca" value="nao"> Não</label> 
+        </div> 
+      </div> 
+      <div> 
+        <label>Você é da região de BA/SE ou AL?</label> 
+        <div class="opcao"> 
+          <label><input type="radio" name="regiao" value="ba-se"> Bahia / Sergipe</label> 
+          <label><input type="radio" name="regiao" value="al"> Alagoas</label> 
+        </div> 
+      </div> 
+      <div> 
+        <label for="nome">Qual é o seu nome completo?</label> 
+        <input type="text" id="nome" name="nome"> 
+      </div> 
+      <div> 
+        <label for="cracha">Qual nome você gostaria que aparecesse no crachá?</label> 
+        <input type="text" id="cracha" name="cracha"> 
+      </div> 
+      <div> 
+        <label for="restricao">Possui alguma restrição alimentar ou alergia que devamos considerar?</label> 
+        <textarea id="restricao" name="restricao"></textarea> 
+      </div> 
+      <div> 
+        <label for="loja">Qual loja/vd ou HIB você faz parte?</label> 
+        <input type="number" id="loja" name="loja" inputmode="numeric" pattern="[0-9]*" > 
+      </div> 
+      <button type="submit">Enviar</button> 
+    </form> 
+  </div> 
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script> 
+  <script> 
+    // 1. Inicializa o Supabase 
+    const SUPABASE_URL = "https://utqgfvskdomojiocijeg.supabase.co"; // coloque sua URL 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w"; // coloque sua chave anon 
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="64x64" href="https://dev-eventos.github.io/grupoginsengconven/favicon.png" alt="favicon" />
+    // 2. Captura o formulário 
+    const form = document.querySelector("form"); 
+    form.addEventListener("submit", async (e) => { 
+      e.preventDefault(); 
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      // 3. Pega os valores do formulário 
+      const presenca = [...form.querySelectorAll('input[name="presenca"]:checked')] 
+        .map(el => el.value).join(", "); 
+      const estado = [...form.querySelectorAll('input[name="regiao"]:checked')] 
+        .map(el => el.value).join(", "); 
+      const nome = form.nome.value; 
+      const restricao = form.restricao.value; 
+      const loja_vd = form.loja.value ? parseInt(form.loja.value) : null; 
 
-  <style>
-    * { font-family: 'poppins', sans-serif; }
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #0C506B;
-      padding: 20px;
-    }
-    .caixa {
-      width: 350px;
-      background-color: #F9F3E4;
-      border-radius: 12px;
-      padding: 30px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-    }
-    .caixa img { max-width: 180px; height: auto; }
-    .caixa p { font-size: 16px; color: #0C506B; line-height: 1.5; }
-    .caixa input { width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
-    .btn { width: 100%; padding: 10px 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; }
-    .btn-google { background-color: #4285F4; color: white; }
-    .btn-google:hover { background-color: #357ae8; }
-    .btn-email { background-color: #0C506B; color: white; }
-    .btn-email:hover { background-color: #09415a; }
-    @media (min-width: 768px) { .caixa { width: 400px; padding: 30px; } .caixa p { font-size: 18px; } }
-  </style>
-</head>
-<body>
+      // 4. Envia para Supabase 
+      const { data, error } = await supabase 
+        .from("convencao") // tabela no Supabase 
+        .insert([{ presenca, estado, nome, restricao, loja_vd }]); 
 
-  <div class="caixa">
-    <!-- Logo -->
-    <img src="https://dev-eventos.github.io/grupoginsengconven/fundo.png" alt="fundo" />
-
-    <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
-    <p>Pedimos que responda este formulário até segunda-feira (22/10) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
-
-    <input type="email" id="email" placeholder="Digite seu e-mail" />
-    <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
-    <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
-    
-    <!-- BOTÃO DE VOLTAR -->
-    <button id="btnVoltar" class="btn btn-email" style="margin-top:10px;">Voltar</button>
-  </div>
-
-<script>
-  const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-  const REDIRECT_AFTER_LOGIN = "https://dev-eventos.github.io/grupoginsengconven/index2.html";
-
-  document.getElementById("btnEmail").addEventListener("click", loginWithEmail);
-  document.getElementById("btnGoogle").addEventListener("click", loginWithGoogle);
-
-  // BOTÃO DE VOLTAR FUNCIONANDO
-  document.getElementById("btnVoltar").addEventListener("click", () => {
-    sessionStorage.setItem("voltar", "true");
-    window.history.back();
-  });
-
-  function loginWithEmail() {
-    const email = prompt("Digite seu email"); // Exemplo simples
-    console.log("Login com email:", email);
-  }
-
-  function loginWithGoogle() {
-    console.log("Login com Google");
-
-    window.loginWithGoogle = async function () {
-      try {
-        const { error } = await supabaseClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: REDIRECT_AFTER_LOGIN }
-        });
-        if (error) alert("Erro no login com Google: " + error.message);
-      } catch (err) {
-        console.error("Erro no loginWithGoogle:", err);
-        alert("Erro no login com Google.");
-      }
-    };
-
-    async function checarSessao() {
-      const { data, error } = await supabaseClient.auth.getSession();
-      console.log(data, error);
-    }
-    checarSessao();
-
-    window.loginWithEmail = async function () {
-      const emailInput = document.getElementById("email");
-      const email = emailInput?.value?.trim();
-      if (!email) return alert("Digite seu e-mail!");
-
-      try {
-        const { error } = await supabaseClient.auth.signInWithOtp({
-          email: email,
-          options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
-        });
-        if (error) alert("Erro ao enviar link: " + error.message);
-        else window.location.href = REDIRECT_AFTER_LOGIN;
-      } catch (err) {
-        console.error("Erro no loginWithEmail:", err);
-        alert("Erro ao tentar enviar link para o e-mail.");
-      }
-    };
-
-    async function handlePostAuth(session) {
-      const email = session?.user?.email;
-      if (!email) { redirectToIndex2(); return; }
-
-      try {
-        const { data: existing, error: selectError } = await supabaseClient
-          .from('usuarios')
-          .select('used, first_access, email')
-          .eq('email', email)
-          .maybeSingle();
-
-        if (selectError) console.error("Erro ao buscar usuário:", selectError);
-
-        if (existing && existing.used) {
-          alert("Você já confirmou presença anteriormente. Redirecionando...");
-          redirectToIndex2();
-          return;
-        }
-
-        const { error: upsertError } = await supabaseClient
-          .from('usuarios')
-          .upsert({
-            email: email,
-            used: true,
-            first_access: new Date().toISOString()
-          }, { onConflict: 'email' });
-
-        if (upsertError) console.error("Erro ao salvar/atualizar usuário:", upsertError);
-
-        redirectToIndex2();
-
-      } catch (err) {
-        console.error("Erro no fluxo pós-auth:", err);
-        redirectToIndex2();
-      }
-    }
-
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) handlePostAuth(session);
-    });
-
-    (async function checkSessionOnLoad() {
-      try {
-        if (sessionStorage.getItem("voltar") === "true") {
-          sessionStorage.removeItem("voltar");
-          return;
-        }
-        const { data } = await supabaseClient.auth.getSession();
-        const session = data?.session ?? null;
-        if (session) await handlePostAuth(session);
-      } catch (err) {
-        console.error("Erro ao checar sessão:", err);
-      }
-    })();
-
-    function redirectToIndex2() {
-      window.location.href = REDIRECT_AFTER_LOGIN;
-    }
-    window.redirectToIndex2 = redirectToIndex2;
-  }
-</script>
-
-</body>
+      if (error) { 
+        console.error("Erro ao enviar:", error); 
+        alert("❌ Erro ao enviar, tente novamente!"); 
+      } else { 
+        alert("✅ Resposta registrada com sucesso!"); 
+        form.reset(); 
+      } 
+    }); 
+  </script> 
+  </script> 
+</body> 
 </html>
-
-
