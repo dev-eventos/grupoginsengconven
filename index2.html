@@ -1,13 +1,9 @@
-<!DOCTYPE html> 
+ <!DOCTYPE html> 
 <html lang="pt-BR"> 
 <head> 
   <meta charset="UTF-8" /> 
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="64x64" href="https://grupoginseng.github.io/grupoginsengconven/favicon.png" alt="favicon" />
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
   <style> 
     /* Reset básico */ 
     * { margin: 0; padding: 0; box-sizing: border-box; } 
@@ -22,7 +18,7 @@
       background-repeat: no-repeat; 
       background-position: center top; 
       background-size: contain; 
-      
+      font-family: "Helvetica Neue LT Pro", sans-serif; 
     } 
     .container { 
       width: 100%; 
@@ -187,7 +183,7 @@
     const SUPABASE_URL = "https://utqgfvskdomojiocijeg.supabase.co";  
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";  
 
-    // ✅ Cliente Supabase renomeado
+    // ✅ Cliente Supabase renomeado corretamente
     const clientSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
     const form = document.getElementById("formConvencao"); 
@@ -228,4 +224,3 @@
   </script> 
 </body> 
 </html>
-
