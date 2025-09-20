@@ -57,10 +57,7 @@
     <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
     <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
     
-    <!-- BOTÃO DE VOLTAR -->
-    <button id="btnVoltar" class="btn btn-email" style="margin-top:10px;">Voltar</button>
-  </div>
-
+  
 
 
   <!-- Importação da biblioteca do Supabase -->
@@ -79,16 +76,12 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
   const emailInput = document.getElementById('email');
   const btnEmail = document.getElementById('btnEmail');
   const btnGoogle = document.getElementById('btnGoogle');
-  const btnVoltar = document.getElementById('btnVoltar');
+  
 
   // Event Listeners
   btnEmail.addEventListener('click', loginWithEmail);
   btnGoogle.addEventListener('click', loginWithGoogle);
-  btnVoltar.addEventListener('click', () => {
-    sessionStorage.setItem("voltar", "true");
-    window.history.back();
-  });
-
+  
   // Função de login com email
   async function loginWithEmail() {
     const email = emailInput.value.trim();
@@ -227,6 +220,7 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 </body>
 </html>
+
 
 
 
