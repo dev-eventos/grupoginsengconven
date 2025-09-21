@@ -202,7 +202,8 @@
       const nome = form.nome.value; 
       const cracha = form.cracha.value;
       const restricao = form.restricao.value; 
-      const loja_vd = form.loja.value ? parseInt(form.loja.value) : null; 
+      const loja_vd = form.loja.value ? form.loja.value.trim() : null;
+ 
 
       try {
         const { data, error } = await clientSupabase 
@@ -229,6 +230,7 @@
   </script> 
 </body> 
 </html>
+
 
 
 
