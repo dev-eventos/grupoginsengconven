@@ -123,7 +123,7 @@
       try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: REDIRECT_AFTER_LOGIN }
+          options: { redirectTo: "https://grupoginseng.github.io/grupoginsengconven/index2.html" }
         });
 
         if (error) alert('Erro ao autenticar com Google: ' + error.message);
@@ -194,3 +194,4 @@
   </script>
 </body>
 </html>
+
