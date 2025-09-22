@@ -99,8 +99,8 @@
           return;
         }
 
-        // Salvar no sessionStorage para lembrar o login
-        sessionStorage.setItem('user_email', email);
+        // Salvar no localStorage para lembrar o login
+        localStorage.setItem('user_email', email);
 
         // Enviar link de autenticação por e-mail (opcional, pode remover se não quiser)
         const { error } = await supabase.auth.signInWithOtp({
@@ -135,15 +135,16 @@
 
     async function checkSession() {
       try {
-        if (sessionStorage.getItem("voltar") === "true") {
-          sessionStorage.removeItem("voltar");
-          return;
+        const savedEmail = localStorage.getItem("user_email");
+        if (savedEmail) {
+          const { data, error } = await supabase.auth.getSession();
+          if (error) console.error('Erro ao verificar sessão:', error);
+
+          if (data.session) {
+            window.location.href = REDIRECT_AFTER_LOGIN;
+            return;
+          }
         }
-
-        const { data, error } = await supabase.auth.getSession();
-        if (error) console.error('Erro ao verificar sessão:', error);
-
-        if (data.session) window.location.href = REDIRECT_AFTER_LOGIN;
       } catch (error) {
         console.error('Erro ao verificar sessão:', error);
       }
@@ -194,5 +195,3 @@
   </script>
 </body>
 </html>
-
-
