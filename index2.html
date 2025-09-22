@@ -1,186 +1,212 @@
-<!DOCTYPE html> 
-<html lang="pt-BR"> 
-<head> 
-  <meta charset="UTF-8" /> 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="64x64" href="https://grupoginseng.github.io/grupoginsengconven/favicon.png" alt="favicon" />
-
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style> 
-    /* Reset básico */ 
-    * { margin: 0; padding: 0; box-sizing: border-box; } 
-    body { 
-      min-height: 100vh; 
-      display: flex; 
-      justify-content: center; 
-      align-items: flex-start; 
-      padding: 52px; 
-      background-color: #0C506B; 
+  <style>
+    /* Reset básico */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 52px;
+      background-color: #0C506B;
       background-image: url("https://grupoginseng.github.io/grupoginsengconven/fundo.png");
-      background-repeat: no-repeat; 
-      background-position: center top; 
+      background-repeat: no-repeat;
+      background-position: center top;
       background-size: contain;
       font-family: 'Poppins', sans-serif;
     }
 
-    .container { 
-      width: 100%; 
-      max-width: 393px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-    } 
-    .logo img { 
-      width: 100%; 
-      max-width: 270px; 
-      height: auto; 
-      margin-top: 40px; 
-      margin-bottom: 40px; 
-    } 
-    form { 
-      width: 100%; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 25px; 
-      font-size: 18px; 
-    } 
-    label { 
-      margin-bottom: 8px; 
-      font-weight: bold; 
-      color: #fff; 
-    } 
-    .opcao { 
-      display: flex; 
-      flex-direction: column; 
-      color: #F9F3E4; 
-      gap: 8px; 
-      margin-top: 10px; 
-    } 
-    .opcao label { 
-      display: flex; 
-      align-items: center; 
-      gap: 6px; 
-      font-size: 17px; 
-      font-weight: normal; 
-    } 
-    .opcao input[type="radio"], .opcao input[type="checkbox"] { 
-      -webkit-appearance: none; 
-      appearance: none; 
-      margin: 0; 
-      width: 28px; 
-      height: 28px; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      background-color: #e2e2e2; 
-      display: grid; 
-      place-content: center; 
-    } 
-    .opcao input[type="radio"]::before, .opcao input[type="checkbox"]::before { 
-      content: ""; 
-      width: 16px; 
-      height: 16px; 
-      border-radius: 50%; 
-      transform: scale(0); 
-      transition: 120ms transform ease-in-out; 
-      background-color: #0C506B; 
-    } 
-    .opcao input[type="radio"]:checked::before, .opcao input[type="checkbox"]:checked::before { 
-      transform: scale(1); 
-    } 
-    input[type="text"], textarea, select { 
-      width: 100%; 
-      padding: 14px; 
-      font-size: 18px; 
-      border-radius: 8px; 
-      border: none; 
-      outline: none; 
+    .container {
+      width: 100%;
+      max-width: 393px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo img {
+      width: 100%;
+      max-width: 270px;
+      height: auto;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      font-size: 18px;
+    }
+
+    label {
       margin-bottom: 8px;
-    } 
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .opcao {
+      display: flex;
+      flex-direction: column;
+      color: #F9F3E4;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .opcao label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 17px;
+      font-weight: normal;
+    }
+
+    .opcao input[type="radio"],
+    .opcao input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #e2e2e2;
+      display: grid;
+      place-content: center;
+    }
+
+    .opcao input[type="radio"]::before,
+    .opcao input[type="checkbox"]::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      background-color: #0C506B;
+    }
+
+    .opcao input[type="radio"]:checked::before,
+    .opcao input[type="checkbox"]:checked::before {
+      transform: scale(1);
+    }
+
+    input[type="text"], textarea, select, input[type="number"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      margin-bottom: 8px;
+    }
+
     select {
       background-color: #fff;
       color: #0C506B;
     }
-    textarea { 
-      min-height: 80px; 
-      resize: vertical; 
-    } 
-    button { 
-      padding: 14px; 
-      font-size: 18px; 
-      font-weight: bold; 
-      color: #0C506B; 
-      background: #F9F3E4; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      transition: background 0.3s; 
-      margin-top: 10px; 
-    } 
-    button:hover { 
-      background: #fff; 
-    } 
-    @media (min-width: 768px) { 
-      .container { 
-        max-width: 600px; 
-        padding: 20px; 
-      } 
-      form { 
-        font-size: 20px; 
-      } 
-      form > div > label { 
-        text-align: center; 
-      } 
-      input[type="text"], textarea, select, button { 
-        padding: 12px; 
-        font-size: 18px; 
-      } 
-      body { 
-        background-size: cover; 
-      } 
-    } 
-  </style> 
-</head> 
-<body> 
-  <div class="container"> 
-    <div class="logo"> 
-      <img src="https://grupoginseng.github.io/grupoginsengconven/convencao.png" alt="Logo Convenção"> 
-    </div> 
-    <form id="formConvencao"> 
-      <div> 
-        <label>Você confirma sua presença na Convenção?</label> 
-        <div class="opcao"> 
-          <label><input type="radio" name="presenca" value="sim"> Sim</label> 
-          <label><input type="radio" name="presenca" value="nao"> Não</label> 
-        </div> 
-      </div> 
-      <div> 
-        <label>Você é da região de BA/SE ou AL?</label> 
-        <div class="opcao"> 
-          <label><input type="radio" name="regiao" value="ba-se"> Bahia / Sergipe</label> 
-          <label><input type="radio" name="regiao" value="al"> Alagoas</label> 
-        </div> 
-      </div> 
-      <div> 
-        <label for="nome">Qual é o seu nome completo?</label> 
-        <input type="text" id="nome" name="nome"> 
-      </div> 
-      <div> 
-        <label for="cracha">Qual nome você gostaria que aparecesse no crachá?</label> 
-        <input type="text" id="cracha" name="cracha"> 
-      </div> 
-      <div> 
-        <label for="restricao">Possui alguma restrição alimentar ou alergia que devamos considerar?</label> 
-        <textarea id="restricao" name="restricao"></textarea> 
-      </div> 
-      <div> 
-        <label for="loja">Qual loja/vd ou HIB você faz parte?</label> 
-        <input type="number" id="loja" name="loja" inputmode="numeric" pattern="[0-9]*" > 
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 14px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #0C506B;
+      background: #F9F3E4;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #fff;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        max-width: 600px;
+        padding: 20px;
+      }
+      form {
+        font-size: 20px;
+      }
+      form > div > label {
+        text-align: center;
+      }
+      input[type="text"], textarea, select, button {
+        padding: 12px;
+        font-size: 18px;
+      }
+      body {
+        background-size: cover;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="https://grupoginseng.github.io/grupoginsengconven/convencao.png" alt="Logo Convenção">
+    </div>
+    <form id="formConvencao">
+      <div>
+        <label>Você confirma sua presença na Convenção?</label>
+        <div class="opcao">
+          <label><input type="radio" name="presenca" value="sim" required> Sim</label>
+          <label><input type="radio" name="presenca" value="nao" required> Não</label>
+        </div>
       </div>
-      <!-- NOVO CAMPO: Tamanho da camisa -->
-      <div> 
-        <label for="camisa">Qual o tamanho da sua camisa?</label> 
-        <select id="camisa" name="camisa">
+
+      <div>
+        <label>Você é da região de BA/SE ou AL?</label>
+        <div class="opcao">
+          <label><input type="radio" name="regiao" value="ba-se" required> Bahia / Sergipe</label>
+          <label><input type="radio" name="regiao" value="al" required> Alagoas</label>
+        </div>
+      </div>
+
+      <div>
+        <label for="nome">Qual é o seu nome completo?</label>
+        <input type="text" id="nome" name="nome" required>
+      </div>
+
+      <div>
+        <label for="cracha">Qual nome você gostaria que aparecesse no crachá?</label>
+        <input type="text" id="cracha" name="cracha" required>
+      </div>
+
+      <div>
+        <label for="restricao">Possui alguma restrição alimentar ou alergia que devamos considerar?</label>
+        <textarea id="restricao" name="restricao" required></textarea>
+      </div>
+
+      <div>
+        <label for="loja">Qual loja/vd ou HIB você faz parte?</label>
+        <input type="number" id="loja" name="loja" inputmode="numeric" pattern="[0-9]*" required>
+      </div>
+
+      <div>
+        <label for="camisa">Qual o tamanho da sua camisa?</label>
+        <select id="camisa" name="camisa" required>
           <option value="">Selecione</option>
           <option value="P">P</option>
           <option value="M">M</option>
@@ -189,50 +215,51 @@
           <option value="XG">XGG</option>
         </select>
       </div>
+
       <button type="submit">Enviar</button>
-    </form> 
-  </div> 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script> 
-  <script> 
-    const SUPABASE_URL = "https://utqgfvskdomojiocijeg.supabase.co";  
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";  
+    </form>
+  </div>
 
-    const clientSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://utqgfvskdomojiocijeg.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
+    const clientSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const form = document.getElementById("formConvencao"); 
-    form.addEventListener("submit", async (e) => { 
-      e.preventDefault(); 
+    const form = document.getElementById("formConvencao");
 
-      const presenca = [...form.querySelectorAll('input[name="presenca"]:checked')] 
-        .map(el => el.value).join(", "); 
-      const estado = [...form.querySelectorAll('input[name="regiao"]:checked')] 
-        .map(el => el.value).join(", "); 
-      const nome = form.nome.value; 
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const presenca = [...form.querySelectorAll('input[name="presenca"]:checked')].map(el => el.value).join(", ");
+      const estado = [...form.querySelectorAll('input[name="regiao"]:checked')].map(el => el.value).join(", ");
+      const nome = form.nome.value;
       const cracha = form.cracha.value;
-      const restricao = form.restricao.value; 
+      const restricao = form.restricao.value;
       const loja_vd = form.loja.value ? parseInt(form.loja.value) : null;
-      const camisa = form.camisa.value; // NOVO CAMPO
+      const camisa = form.camisa.value;
 
       try {
-        console.log({ presenca, estado, nome, cracha, restricao, loja_vd, camisa }); // ✅ debug
+        console.log({ presenca, estado, nome, cracha, restricao, loja_vd, camisa });
+        const { data, error } = await clientSupabase
+          .from("convencao")
+          .insert([{ presenca, estado, nome, cracha, restricao, loja_vd, camisa }]);
 
-        const { data, error } = await clientSupabase 
-          .from("convencao") 
-          .insert([{ presenca, estado, nome, cracha, restricao, loja_vd, camisa }]); 
-
-        if (error) { 
-          console.error("Erro ao enviar:", error); 
-          alert("❌ Erro ao enviar, tente novamente!"); 
-        } else { 
-          alert("✅ Resposta registrada com sucesso!"); 
-          form.reset(); 
-          window.location.assign("https://grupoginseng.github.io/grupoginsengconven/index3.html"); 
+        if (error) {
+          console.error("Erro ao enviar:", error);
+          alert("❌ Erro ao enviar, tente novamente!");
+        } else {
+          alert("✅ Resposta registrada com sucesso!");
+          form.reset();
+          window.location.assign("https://grupoginseng.github.io/grupoginsengconven/index3.html");
         }
       } catch(err) {
         console.error("Erro inesperado:", err);
         alert("❌ Erro inesperado ao enviar!");
       }
-    }); 
-  </script> 
-</body> 
+    });
+  </script>
+</body>
 </html>
+
+
