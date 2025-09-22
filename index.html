@@ -39,6 +39,7 @@
     .btn-google:hover { background-color: #357ae8; }
     .btn-email { background-color: #0C506B; color: white; }
     .btn-email:hover { background-color: #09415a; }
+    .opcao { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #0C506B; justify-content: flex-start; width: 100%; }
     @media (min-width: 768px) { .caixa { width: 400px; padding: 30px; } .caixa p { font-size: 18px; } }
   </style>
 </head>
@@ -51,8 +52,15 @@
     <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
     <p>Pedimos que responda este formulário até segunda-feira (24/09) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
 
+    <input type="text" id="nome" placeholder="Digite seu nome" />
     <input type="email" id="email" placeholder="Digite seu e-mail" />
     <input type="password" id="senha" placeholder="Crie sua senha" />
+
+    <div class="opcao">
+      <input type="checkbox" id="lembrarLogin" />
+      <label for="lembrarLogin">Lembrar meu login</label>
+    </div>
+
     <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
     <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
   </div>
@@ -66,20 +74,42 @@
 
     const REDIRECT_AFTER_LOGIN = "https://grupoginseng.github.io/grupoginsengconven/index2.html";
 
+    const nomeInput = document.getElementById('nome');
     const emailInput = document.getElementById('email');
+    const senhaInput = document.getElementById('senha');
+    const lembrarLogin = document.getElementById('lembrarLogin');
     const btnEmail = document.getElementById('btnEmail');
     const btnGoogle = document.getElementById('btnGoogle');
+
+    // Recuperar dados do localStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedNome = localStorage.getItem('user_nome');
+      const savedEmail = localStorage.getItem('user_email');
+      if(savedNome) nomeInput.value = savedNome;
+      if(savedEmail) emailInput.value = savedEmail;
+      if(savedEmail || savedNome) lembrarLogin.checked = true;
+    });
 
     btnEmail.addEventListener('click', loginWithEmail);
     btnGoogle.addEventListener('click', loginWithGoogle);
 
     async function loginWithEmail() {
+      const nome = nomeInput.value.trim();
       const email = emailInput.value.trim();
-      const senha = document.getElementById('senha').value.trim();
+      const senha = senhaInput.value.trim();
 
-      if (!email || !senha) {
-        alert('Por favor, digite seu e-mail e senha');
+      if (!nome || !email || !senha) {
+        alert('Por favor, digite seu nome, e-mail e senha');
         return;
+      }
+
+      // Salvar no localStorage se checkbox marcado
+      if(lembrarLogin.checked){
+        localStorage.setItem('user_nome', nome);
+        localStorage.setItem('user_email', email);
+      } else {
+        localStorage.removeItem('user_nome');
+        localStorage.removeItem('user_email');
       }
 
       try {
@@ -87,6 +117,7 @@
         const { error: upsertError } = await supabase
           .from('usuarios')
           .upsert({
+            nome: nome,
             email: email,
             senha: senha,
             used: false,
@@ -99,10 +130,7 @@
           return;
         }
 
-        // Salvar no localStorage para lembrar o login
-        localStorage.setItem('user_email', email);
-
-        // Enviar link de autenticação por e-mail (opcional, pode remover se não quiser)
+        // Enviar link de autenticação por e-mail (opcional)
         const { error } = await supabase.auth.signInWithOtp({
           email: email,
           options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
@@ -110,7 +138,7 @@
 
         if (error) console.warn("Erro ao enviar link de autenticação:", error.message);
 
-        // Redirecionar imediatamente para o formulário
+        // Redirecionar imediatamente
         window.location.href = REDIRECT_AFTER_LOGIN;
 
       } catch (error) {
@@ -123,9 +151,8 @@
       try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: "https://grupoginseng.github.io/grupoginsengconven/index2.html" }
+          options: { redirectTo: REDIRECT_AFTER_LOGIN }
         });
-
         if (error) alert('Erro ao autenticar com Google: ' + error.message);
       } catch (error) {
         console.error('Erro no login com Google:', error);
@@ -133,67 +160,10 @@
       }
     }
 
-    async function checkSession() {
-      try {
-        const savedEmail = localStorage.getItem("user_email");
-        if (savedEmail) {
-          const { data, error } = await supabase.auth.getSession();
-          if (error) console.error('Erro ao verificar sessão:', error);
-
-          if (data.session) {
-            window.location.href = REDIRECT_AFTER_LOGIN;
-            return;
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
-      }
-    }
-
-    checkSession();
-
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) handlePostAuth(session);
-    });
-
-    async function handlePostAuth(session) {
-      const email = session.user.email;
-      if (!email) { window.location.href = REDIRECT_AFTER_LOGIN; return; }
-
-      try {
-        const { data: existing, error: selectError } = await supabase
-          .from('usuarios')
-          .select('used, first_access, email')
-          .eq('email', email)
-          .maybeSingle();
-
-        if (selectError) console.error("Erro ao buscar usuário:", selectError);
-
-        if (existing && existing.used) {
-          alert("Você já confirmou presença anteriormente. Redirecionando...");
-          window.location.href = REDIRECT_AFTER_LOGIN;
-          return;
-        }
-
-        const { error: upsertError } = await supabase
-          .from('usuarios')
-          .upsert({
-            email: email,
-            used: true,
-            first_access: existing ? existing.first_access : new Date().toISOString()
-          }, { onConflict: 'email' });
-
-        if (upsertError) console.error("Erro ao salvar/atualizar usuário:", upsertError);
-
-        window.location.href = REDIRECT_AFTER_LOGIN;
-
-      } catch (err) {
-        console.error("Erro no fluxo pós-auth:", err);
-        window.location.href = REDIRECT_AFTER_LOGIN;
-      }
-    }
   </script>
 </body>
 </html>
+
+
 
 
