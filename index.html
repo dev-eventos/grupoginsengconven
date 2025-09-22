@@ -39,16 +39,15 @@
     .btn-google:hover { background-color: #357ae8; }
     .btn-email { background-color: #0C506B; color: white; }
     .btn-email:hover { background-color: #09415a; }
-    .opcao { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #0C506B; justify-content: flex-start; width: 100%; vertical-align: middle; }
+    .opcao { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #0C506B; justify-content: flex-start; width: 100%; }
+    .hidden { display: none; }
     @media (min-width: 768px) { .caixa { width: 400px; padding: 30px; } .caixa p { font-size: 18px; } }
   </style>
 </head>
 <body>
 
-  <div class="caixa">
-    <!-- Logo -->
+  <div class="caixa" id="mainBox">
     <img src="https://grupoginseng.github.io/grupoginsengconven/logoazul.png" alt="Logo Convenção" />
-
     <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
     <p>Pedimos que responda este formulário até segunda-feira (24/09) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
 
@@ -62,13 +61,25 @@
 
     <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
     <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
+
+    <!-- Botão para mostrar login oculto -->
+    <button id="btnAdmin" class="btn" style="background:#ccc;color:#0C506B;margin-top:10px;">Login</button>
+  </div>
+
+  <!-- Seção oculta para login administrativo -->
+  <div class="caixa hidden" id="adminBox">
+    <h3>Login Administrativo</h3>
+    
+    <input type="email" id="adminEmail" placeholder="E-mail" />
+    <input type="password" id="adminSenha" placeholder="Senha" />
+    <button id="btnAdminLogin" class="btn btn-email">Entrar</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
     const supabaseUrl = "https://utqgfvskdomojiocijeg.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
+    const supabaseKey = "YOUR_SUPABASE_ANON_KEY";
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     const REDIRECT_AFTER_LOGIN = "https://grupoginseng.github.io/grupoginsengconven/index2.html";
@@ -79,6 +90,10 @@
     const btnEmail = document.getElementById('btnEmail');
     const btnGoogle = document.getElementById('btnGoogle');
 
+    const btnAdmin = document.getElementById('btnAdmin');
+    const adminBox = document.getElementById('adminBox');
+    const btnAdminLogin = document.getElementById('btnAdminLogin');
+
     // Recuperar dados do localStorage
     window.addEventListener('DOMContentLoaded', () => {
       const savedEmail = localStorage.getItem('user_email');
@@ -88,6 +103,14 @@
 
     btnEmail.addEventListener('click', loginWithEmail);
     btnGoogle.addEventListener('click', loginWithGoogle);
+   btnAdmin.addEventListener('click', () => {
+  // Esconder todo o formulário principal
+  document.getElementById('mainBox').style.display = 'none';
+
+  // Mostrar o formulário administrativo
+  adminBox.classList.remove('hidden');
+});
+
 
     async function loginWithEmail() {
       const email = emailInput.value.trim();
@@ -98,41 +121,24 @@
         return;
       }
 
-      // Salvar no localStorage se checkbox marcado
-      if(lembrarLogin.checked){
-        localStorage.setItem('user_email', email);
-      } else {
-        localStorage.removeItem('user_email');
-      }
+      // **ESCONDER FORMULÁRIO**
+      emailInput.style.display = 'none';
+      senhaInput.style.display = 'none';
+      lembrarLogin.parentElement.style.display = 'none';
+      btnEmail.style.display = 'none';
+      btnGoogle.style.display = 'none';
+
+      if(lembrarLogin.checked) localStorage.setItem('user_email', email);
+      else localStorage.removeItem('user_email');
 
       try {
-        // Salvar/atualizar usuário no Supabase
         const { error: upsertError } = await supabase
           .from('usuarios')
-          .upsert({
-            email: email,
-            senha: senha,
-            used: false,
-            first_access: new Date().toISOString()
-          }, { onConflict: 'email' });
+          .upsert({ email, senha, used: false, first_access: new Date().toISOString() }, { onConflict: 'email' });
 
-        if (upsertError) {
-          console.error("Erro ao salvar usuário:", upsertError);
-          alert("Erro ao salvar usuário");
-          return;
-        }
+        if (upsertError) { alert("Erro ao salvar usuário"); return; }
 
-        // Enviar link de autenticação por e-mail (opcional)
-        const { error } = await supabase.auth.signInWithOtp({
-          email: email,
-          options: { emailRedirectTo: REDIRECT_AFTER_LOGIN }
-        });
-
-        if (error) console.warn("Erro ao enviar link de autenticação:", error.message);
-
-        // Redirecionar imediatamente
         window.location.href = REDIRECT_AFTER_LOGIN;
-
       } catch (error) {
         console.error('Erro no login com email:', error);
         alert('Erro inesperado ao tentar fazer login');
@@ -141,16 +147,35 @@
 
     async function loginWithGoogle() {
       try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: REDIRECT_AFTER_LOGIN }
-        });
+        const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: REDIRECT_AFTER_LOGIN } });
         if (error) alert('Erro ao autenticar com Google: ' + error.message);
       } catch (error) {
         console.error('Erro no login com Google:', error);
-        alert('Erro inesperado ao tentar fazer login com Google');
       }
     }
+
+    // Login Administrativo
+    btnAdminLogin.addEventListener('click', async () => {
+      const email = document.getElementById('adminEmail').value.trim();
+      const senha = document.getElementById('adminSenha').value.trim();
+
+      if(!email || !senha){ alert("Digite e-mail e senha"); return; }
+
+      try {
+        const { data, error } = await supabase
+          .from('usuarios')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+
+        if(error){ alert("Erro ao buscar usuário"); return; }
+        if(!data || data.senha !== senha){ alert("E-mail ou senha inválidos"); return; }
+
+        alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data));
+      } catch(err) {
+        console.error("Erro login admin:", err);
+      }
+    });
 
   </script>
 </body>
