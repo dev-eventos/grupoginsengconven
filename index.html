@@ -121,7 +121,7 @@
         return;
       }
 
-      // **ESCONDER FORMULÁRIO**
+      // **ESCONDER FORMULÁRIO** 
       emailInput.style.display = 'none';
       senhaInput.style.display = 'none';
       lembrarLogin.parentElement.style.display = 'none';
@@ -155,25 +155,31 @@
     }
 
     // Login Administrativo
-    btnAdminLogin.addEventListener('click', async () => {
-      const email = document.getElementById('adminEmail').value.trim();
-      const senha = document.getElementById('adminSenha').value.trim();
+   btnAdminLogin.addEventListener('click', async () => {
+  const email = document.getElementById('adminEmail').value.trim();
+  const senha = document.getElementById('adminSenha').value.trim();
 
-      if(!email || !senha){ alert("Digite e-mail e senha"); return; }
+  if(!email || !senha){ alert("Digite e-mail e senha"); return; }
 
-      try {
-        const { data, error } = await supabase.rpc('login_admin', { p_email: email, p_senha: senha });
+  try {
+    const { data, error } = await supabase.rpc('login_admin', { p_email: email, p_senha: senha });
 
-if (error) { alert("Erro ao buscar usuário"); return; }
-if (!data || data.length === 0) { alert("E-mail ou senha inválidos"); return; }
+    if (error) { alert("Erro ao buscar usuário"); return; }
+    if (!data || data.length === 0) { alert("E-mail ou senha inválidos"); return; }
 
-alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data[0]));
+    alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data[0]));
+  } catch(err) {
+    console.error("Erro login admin:", err);
+    alert("Erro inesperado ao tentar fazer login");
+  }
+});
 
 
        
   </script>
 </body>
 </html>
+
 
 
 
