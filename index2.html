@@ -104,7 +104,7 @@
       transform: scale(1);
     }
 
-    input[type="text"], input[type="email"], input[type="password"], textarea, select, input[type="number"] {
+    input[type="text"], textarea, select, input[type="number"] {
       width: 100%;
       padding: 14px;
       font-size: 18px;
@@ -152,7 +152,7 @@
       form > div > label {
         text-align: center;
       }
-      input[type="text"], input[type="email"], input[type="password"], textarea, select, button {
+      input[type="text"], textarea, select, button {
         padding: 12px;
         font-size: 18px;
       }
@@ -167,27 +167,6 @@
     <div class="logo">
       <img src="https://grupoginseng.github.io/grupoginsengconven/convencao.png" alt="Logo Convenção">
     </div>
-
-    <!-- Formulário de Login -->
-    <form id="formLogin" style="margin-bottom: 40px;">
-      <h2 style="color:#fff; text-align:center; margin-bottom: 20px;">Login</h2>
-      <label for="loginNome">Nome</label>
-      <input type="text" id="loginNome" name="loginNome" required>
-
-      <label for="loginEmail">E-mail</label>
-      <input type="email" id="loginEmail" name="loginEmail" required>
-
-      <label for="loginSenha">Senha</label>
-      <input type="password" id="loginSenha" name="loginSenha" required>
-
-      <div class="opcao">
-        <label><input type="checkbox" id="lembrarLogin"> Lembrar meu login</label>
-      </div>
-
-      <button type="submit">Entrar</button>
-    </form>
-
-    <!-- Formulário de Cadastro / Presença -->
     <form id="formConvencao">
       <div>
         <label>Você confirma sua presença na Convenção?</label>
@@ -247,32 +226,6 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";
     const clientSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Lembrar login com localStorage
-    const loginEmail = document.getElementById("loginEmail");
-    const lembrarLogin = document.getElementById("lembrarLogin");
-
-    if(localStorage.getItem("emailUsuario")) {
-      loginEmail.value = localStorage.getItem("emailUsuario");
-      lembrarLogin.checked = true;
-    }
-
-    document.getElementById("formLogin").addEventListener("submit", function(e){
-      e.preventDefault();
-      const nome = document.getElementById("loginNome").value;
-      const email = loginEmail.value;
-      const senha = document.getElementById("loginSenha").value;
-
-      if(lembrarLogin.checked){
-        localStorage.setItem("emailUsuario", email);
-      } else {
-        localStorage.removeItem("emailUsuario");
-      }
-
-      alert(`Login realizado!\nNome: ${nome}\nEmail: ${email}`);
-      // Aqui você pode integrar com Supabase para autenticação real
-    });
-
-    // Formulário de presença
     const form = document.getElementById("formConvencao");
 
     form.addEventListener("submit", async (e) => {
@@ -308,5 +261,4 @@
   </script>
 </body>
 </html>
-
 
