@@ -68,7 +68,7 @@
 
   <!-- Seção oculta para login administrativo -->
   <div class="caixa hidden" id="adminBox">
-    <h3>Login</h3>
+    <h3>Login Administrativo</h3>
     
     <input type="email" id="adminEmail" placeholder="E-mail" />
     <input type="password" id="adminSenha" placeholder="Senha" />
@@ -121,7 +121,7 @@
         return;
       }
 
-      // **ESCONDER FORMULÁRIO** 
+      // **ESCONDER FORMULÁRIO**
       emailInput.style.display = 'none';
       senhaInput.style.display = 'none';
       lembrarLogin.parentElement.style.display = 'none';
@@ -153,33 +153,47 @@
         console.error('Erro no login com Google:', error);
       }
     }
-
+    
     // Login Administrativo
-   btnAdminLogin.addEventListener('click', async () => {
+    btnAdminLogin.addEventListener('click', async () => {
   const email = document.getElementById('adminEmail').value.trim();
   const senha = document.getElementById('adminSenha').value.trim();
 
   if(!email || !senha){ alert("Digite e-mail e senha"); return; }
 
   try {
-    const { data, error } = await supabase.rpc('login_admin', { p_email: email, p_senha: senha });
+    console.log("Tentando login admin com:", email, senha);
 
-if (error) { alert("Erro ao buscar usuário"); return; }
-if (!data || data.length === 0) { alert("E-mail ou senha inválidos"); return; }
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
 
-alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data[0]));
+    if(error){ 
+      console.error("Erro ao buscar usuário:", error);
+      alert("Erro ao buscar usuário"); 
+      return; 
+    }
 
-       
+    console.log("Dados retornados:", data);
+
+    if(!data || data.senha !== senha){ 
+      alert("E-mail ou senha inválidos"); 
+      return; 
+    }
+
+    alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data));
+  } catch(err) {
+    console.error("Erro login admin:", err);
+    alert("Erro inesperado ao tentar fazer login");
+  }
+});
+
+
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
