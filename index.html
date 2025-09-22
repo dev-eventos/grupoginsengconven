@@ -33,14 +33,9 @@
     }
     .caixa img { max-width: 180px; height: auto; }
     .caixa p { font-size: 16px; color: #0C506B; line-height: 1.5; }
-    .caixa input { width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
     .btn { width: 100%; padding: 10px 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; }
     .btn-google { background-color: #4285F4; color: white; }
     .btn-google:hover { background-color: #357ae8; }
-    .btn-email { background-color: #0C506B; color: white; }
-    .btn-email:hover { background-color: #09415a; }
-    .opcao { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #0C506B; justify-content: flex-start; width: 100%; }
-    .hidden { display: none; }
     @media (min-width: 768px) { .caixa { width: 400px; padding: 30px; } .caixa p { font-size: 18px; } }
   </style>
 </head>
@@ -49,30 +44,10 @@
   <div class="caixa" id="mainBox">
     <img src="https://grupoginseng.github.io/grupoginsengconven/logoazul.png" alt="Logo Convenção" />
     <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
-    <p>Pedimos que responda este formulário até segunda-feira (24/09) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
+    <p>Pedimos que responda este formulário até segunda-feira (24/09) para confirmar sua participação.</p>
 
-    <input type="email" id="email" placeholder="Digite seu e-mail" />
-    <input type="password" id="senha" placeholder="Crie sua senha" />
-
-    <div class="opcao">
-      <input type="checkbox" id="lembrarLogin" />
-      <label for="lembrarLogin">Lembrar meu login</label>
-    </div>
-
-    <button id="btnEmail" class="btn btn-email">Entrar com e-mail</button>
+    <!-- Apenas o botão de login com Google -->
     <button id="btnGoogle" class="btn btn-google">Entrar com Google</button>
-
-    <!-- Botão para mostrar login oculto -->
-    <button id="btnAdmin" class="btn" style="background:#ccc;color:#0C506B;margin-top:10px;">Login</button>
-  </div>
-
-  <!-- Seção oculta para login administrativo -->
-  <div class="caixa hidden" id="adminBox">
-    <h3>Login Administrativo</h3>
-    
-    <input type="email" id="adminEmail" placeholder="E-mail" />
-    <input type="password" id="adminSenha" placeholder="Senha" />
-    <button id="btnAdminLogin" class="btn btn-email">Entrar</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -84,116 +59,20 @@
 
     const REDIRECT_AFTER_LOGIN = "https://grupoginseng.github.io/grupoginsengconven/index2.html";
 
-    const emailInput = document.getElementById('email');
-    const senhaInput = document.getElementById('senha');
-    const lembrarLogin = document.getElementById('lembrarLogin');
-    const btnEmail = document.getElementById('btnEmail');
     const btnGoogle = document.getElementById('btnGoogle');
 
-    const btnAdmin = document.getElementById('btnAdmin');
-    const adminBox = document.getElementById('adminBox');
-    const btnAdminLogin = document.getElementById('btnAdminLogin');
-
-    // Recuperar dados do localStorage
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedEmail = localStorage.getItem('user_email');
-      if(savedEmail) emailInput.value = savedEmail;
-      if(savedEmail) lembrarLogin.checked = true;
-    });
-
-    btnEmail.addEventListener('click', loginWithEmail);
-    btnGoogle.addEventListener('click', loginWithGoogle);
-   btnAdmin.addEventListener('click', () => {
-  // Esconder todo o formulário principal
-  document.getElementById('mainBox').style.display = 'none';
-
-  // Mostrar o formulário administrativo
-  adminBox.classList.remove('hidden');
-});
-
-
-    async function loginWithEmail() {
-      const email = emailInput.value.trim();
-      const senha = senhaInput.value.trim();
-
-      if (!email || !senha) {
-        alert('Por favor, digite seu e-mail e senha');
-        return;
-      }
-
-      // **ESCONDER FORMULÁRIO**
-      emailInput.style.display = 'none';
-      senhaInput.style.display = 'none';
-      lembrarLogin.parentElement.style.display = 'none';
-      btnEmail.style.display = 'none';
-      btnGoogle.style.display = 'none';
-
-      if(lembrarLogin.checked) localStorage.setItem('user_email', email);
-      else localStorage.removeItem('user_email');
-
+    btnGoogle.addEventListener('click', async () => {
       try {
-        const { error: upsertError } = await supabase
-          .from('usuarios')
-          .upsert({ email, senha, used: false, first_access: new Date().toISOString() }, { onConflict: 'email' });
-
-        if (upsertError) { alert("Erro ao salvar usuário"); return; }
-
-        window.location.href = REDIRECT_AFTER_LOGIN;
-      } catch (error) {
-        console.error('Erro no login com email:', error);
-        alert('Erro inesperado ao tentar fazer login');
-      }
-    }
-
-    async function loginWithGoogle() {
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: REDIRECT_AFTER_LOGIN } });
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: REDIRECT_AFTER_LOGIN }
+        });
         if (error) alert('Erro ao autenticar com Google: ' + error.message);
       } catch (error) {
         console.error('Erro no login com Google:', error);
       }
-    }
-    
-    // Login Administrativo
-    btnAdminLogin.addEventListener('click', async () => {
-  const email = document.getElementById('adminEmail').value.trim();
-  const senha = document.getElementById('adminSenha').value.trim();
-
-  if(!email || !senha){ alert("Digite e-mail e senha"); return; }
-
-  try {
-    console.log("Tentando login admin com:", email, senha);
-
-    const { data, error } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('email', email)
-      .maybeSingle();
-
-    if(error){ 
-      console.error("Erro ao buscar usuário:", error);
-      alert("Erro ao buscar usuário"); 
-      return; 
-    }
-
-    console.log("Dados retornados:", data);
-
-    if(!data || data.senha !== senha){ 
-      alert("E-mail ou senha inválidos"); 
-      return; 
-    }
-
-    alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data));
-  } catch(err) {
-    console.error("Erro login admin:", err);
-    alert("Erro inesperado ao tentar fazer login");
-  }
-});
-
-
+    });
   </script>
 </body>
 </html>
-
-
 
