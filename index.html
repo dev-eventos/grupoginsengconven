@@ -162,24 +162,19 @@
       if(!email || !senha){ alert("Digite e-mail e senha"); return; }
 
       try {
-        const { data, error } = await supabase
-          .from('usuarios')
-          .select('*')
-          .eq('email', email)
-          .maybeSingle();
+        const { data, error } = await supabase.rpc('login_admin', { p_email: email, p_senha: senha });
 
-        if(error){ alert("Erro ao buscar usuário"); return; }
-        if(!data || data.senha !== senha){ alert("E-mail ou senha inválidos"); return; }
+if (error) { alert("Erro ao buscar usuário"); return; }
+if (!data || data.length === 0) { alert("E-mail ou senha inválidos"); return; }
 
-        alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data));
-      } catch(err) {
-        console.error("Erro login admin:", err);
-      }
-    });
+alert("Login bem-sucedido! Dados do usuário: " + JSON.stringify(data[0]));
 
+
+       
   </script>
 </body>
 </html>
+
 
 
 
