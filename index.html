@@ -52,7 +52,6 @@
     <p>Olá, Time Ginseng! 💚 Estamos muito felizes em anunciar nossa convenção e contamos com a sua presença!</p>
     <p>Pedimos que responda este formulário até segunda-feira (24/09) para confirmar sua participação e indicar o nome que deseja no seu crachá.</p>
 
-    <input type="text" id="nome" placeholder="Digite seu nome" />
     <input type="email" id="email" placeholder="Digite seu e-mail" />
     <input type="password" id="senha" placeholder="Crie sua senha" />
 
@@ -74,7 +73,6 @@
 
     const REDIRECT_AFTER_LOGIN = "https://grupoginseng.github.io/grupoginsengconven/index2.html";
 
-    const nomeInput = document.getElementById('nome');
     const emailInput = document.getElementById('email');
     const senhaInput = document.getElementById('senha');
     const lembrarLogin = document.getElementById('lembrarLogin');
@@ -83,32 +81,27 @@
 
     // Recuperar dados do localStorage
     window.addEventListener('DOMContentLoaded', () => {
-      const savedNome = localStorage.getItem('user_nome');
       const savedEmail = localStorage.getItem('user_email');
-      if(savedNome) nomeInput.value = savedNome;
       if(savedEmail) emailInput.value = savedEmail;
-      if(savedEmail || savedNome) lembrarLogin.checked = true;
+      if(savedEmail) lembrarLogin.checked = true;
     });
 
     btnEmail.addEventListener('click', loginWithEmail);
     btnGoogle.addEventListener('click', loginWithGoogle);
 
     async function loginWithEmail() {
-      const nome = nomeInput.value.trim();
       const email = emailInput.value.trim();
       const senha = senhaInput.value.trim();
 
-      if (!nome || !email || !senha) {
-        alert('Por favor, digite seu nome, e-mail e senha');
+      if (!email || !senha) {
+        alert('Por favor, digite seu e-mail e senha');
         return;
       }
 
       // Salvar no localStorage se checkbox marcado
       if(lembrarLogin.checked){
-        localStorage.setItem('user_nome', nome);
         localStorage.setItem('user_email', email);
       } else {
-        localStorage.removeItem('user_nome');
         localStorage.removeItem('user_email');
       }
 
@@ -117,7 +110,6 @@
         const { error: upsertError } = await supabase
           .from('usuarios')
           .upsert({
-            nome: nome,
             email: email,
             senha: senha,
             used: false,
@@ -163,6 +155,7 @@
   </script>
 </body>
 </html>
+
 
 
 
