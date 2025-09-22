@@ -5,7 +5,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="64x64" href="https://grupoginseng.github.io/grupoginsengconven/favicon.png" alt="favicon" />
 
- <!-- Google Fonts -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style> 
     /* Reset básico */ 
@@ -88,23 +88,22 @@
     .opcao input[type="radio"]:checked::before, .opcao input[type="checkbox"]:checked::before { 
       transform: scale(1); 
     } 
-    input[type="text"], textarea { 
+    input[type="text"], textarea, select { 
       width: 100%; 
       padding: 14px; 
       font-size: 18px; 
       border-radius: 8px; 
       border: none; 
       outline: none; 
+      margin-bottom: 8px;
     } 
+    select {
+      background-color: #fff;
+      color: #0C506B;
+    }
     textarea { 
       min-height: 80px; 
       resize: vertical; 
-    } 
-    input[type="text"], input[type="number"], textarea, button { 
-      padding: 14px; 
-      font-size: 18px; 
-      margin-bottom: 8px; 
-      border-radius: 8px; 
     } 
     button { 
       padding: 14px; 
@@ -132,7 +131,7 @@
       form > div > label { 
         text-align: center; 
       } 
-      input[type="text"], textarea, button { 
+      input[type="text"], textarea, select, button { 
         padding: 12px; 
         font-size: 18px; 
       } 
@@ -177,7 +176,19 @@
       <div> 
         <label for="loja">Qual loja/vd ou HIB você faz parte?</label> 
         <input type="number" id="loja" name="loja" inputmode="numeric" pattern="[0-9]*" > 
-      </div> 
+      </div>
+      <!-- NOVO CAMPO: Tamanho da camisa -->
+      <div> 
+        <label for="camisa">Qual o tamanho da sua camisa?</label> 
+        <select id="camisa" name="camisa">
+          <option value="">Selecione</option>
+          <option value="P">P</option>
+          <option value="M">M</option>
+          <option value="G">G</option>
+          <option value="GG">GG</option>
+          <option value="XG">XGG</option>
+        </select>
+      </div>
       <button type="submit">Enviar</button>
     </form> 
   </div> 
@@ -186,7 +197,6 @@
     const SUPABASE_URL = "https://utqgfvskdomojiocijeg.supabase.co";  
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWdmdnNrZG9tb2ppb2NpamVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODQyNzEsImV4cCI6MjA3Mzg2MDI3MX0.XFJ0VpMhsi0Y6unQbW2jW7zYbVw7dufy83E1eFvKJ6w";  
 
-    // ✅ Cliente Supabase renomeado corretamente
     const clientSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
     const form = document.getElementById("formConvencao"); 
@@ -201,13 +211,14 @@
       const cracha = form.cracha.value;
       const restricao = form.restricao.value; 
       const loja_vd = form.loja.value ? parseInt(form.loja.value) : null;
+      const camisa = form.camisa.value; // NOVO CAMPO
 
       try {
-        console.log({ presenca, estado, nome, cracha, restricao, loja_vd }); // ✅ debug
+        console.log({ presenca, estado, nome, cracha, restricao, loja_vd, camisa }); // ✅ debug
 
         const { data, error } = await clientSupabase 
           .from("convencao") 
-          .insert([{ presenca, estado, nome, cracha, restricao, loja_vd }]); 
+          .insert([{ presenca, estado, nome, cracha, restricao, loja_vd, camisa }]); 
 
         if (error) { 
           console.error("Erro ao enviar:", error); 
